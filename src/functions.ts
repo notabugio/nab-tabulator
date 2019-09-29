@@ -46,6 +46,7 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
     if (diffKeys.length) {
       await new Promise(ok => peer.get(countsSoul).put(diff, ok))
     }
+    scope.off()
   } catch (e) {
     console.error("Tabulator error", thingId, e.stack || e)
   }
