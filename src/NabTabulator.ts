@@ -56,7 +56,7 @@ export class NabTabulator extends ChainGunSear {
    * Temporary compatibility measure for notabug-peer until logic is moved here
    */
   newScope(): any {
-    return Query.createScope(this, {})
+    return Query.createScope(this, { unsub: true })
   }
 
   /**
@@ -67,6 +67,7 @@ export class NabTabulator extends ChainGunSear {
   }
 
   didReceiveDiff(msg: any) {
+    this.socket.ingest([msg])
     const ids = idsToTabulate(msg)
     if (ids.length) {
       this.tabulatorQueue.enqueueMany(ids)
