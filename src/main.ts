@@ -1,3 +1,3 @@
 import { NabTabulator } from "./NabTabulator"
 
-export default NabTabulator
+new NabTabulator()
