@@ -1,6 +1,7 @@
-import { ChainGunSear, GunGraph } from "@notabug/chaingun-sear"
+import { ChainGunSear, GunGraph, GunProcessQueue } from "@notabug/chaingun-sear"
 import SocketClusterGraphConnector from "@notabug/chaingun-socket-cluster-connector"
-import { Oracle, Tabulator, Query, Config } from "@notabug/peer"
+import { Query, Config } from "@notabug/peer"
+import { idsToTabulate, tabulateThing } from "./functions"
 
 interface Opts {
   socketCluster: any
@@ -27,7 +28,7 @@ Config.update({
 
 export class NabTabulator extends ChainGunSear {
   socket: SocketClusterGraphConnector
-  oracle: Oracle
+  tabulatorQueue: GunProcessQueue
 
   gun: ChainGunSear // temp compatibility thing for notabug-peer transition
 
@@ -44,6 +45,9 @@ export class NabTabulator extends ChainGunSear {
     super({ graph, ...opts })
     this.gun = this
 
+    this.tabulatorQueue = new GunProcessQueue()
+    this.tabulatorQueue.middleware.use(id => tabulateThing(this, id))
+
     this.socket = socket
     this.authenticateAndListen()
   }
@@ -51,8 +55,8 @@ export class NabTabulator extends ChainGunSear {
   /**
    * Temporary compatibility measure for notabug-peer until logic is moved here
    */
-  newScope(this: NabTabulator, opts?: any): any {
-    return Query.createScope(this, opts)
+  newScope(): any {
+    return Query.createScope(this, {})
   }
 
   /**
@@ -62,10 +66,12 @@ export class NabTabulator extends ChainGunSear {
     return this.user().is
   }
 
-  buildOracle() {
-    const oracle = new Oracle()
-    oracle.use(new Tabulator.Queue(this))
-    return oracle
+  didReceiveDiff(msg: any) {
+    const ids = idsToTabulate(msg)
+    if (ids.length) {
+      this.tabulatorQueue.enqueueMany(ids)
+    }
+    this.tabulatorQueue.process()
   }
 
   authenticateAndListen() {
@@ -83,10 +89,10 @@ export class NabTabulator extends ChainGunSear {
         .auth(process.env.GUN_ALIAS, process.env.GUN_PASSWORD)
         .then(() => {
           console.log(`Logged in as ${process.env.GUN_ALIAS}`)
-          this.oracle = this.buildOracle()
-          this.socket.subscribeToChannel("gun/put/diff", msg => {
-            this.oracle.onPut(msg)
-          })
+          this.socket.subscribeToChannel(
+            "gun/put/diff",
+            this.didReceiveDiff.bind(this)
+          )
         })
     }
   }
