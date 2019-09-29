@@ -56,7 +56,7 @@ export class NabTabulator extends ChainGunSear {
    * Temporary compatibility measure for notabug-peer until logic is moved here
    */
   newScope(): any {
-    return Query.createScope(this, { unsub: true })
+    return Query.createScope(this, { unsub: !!process.env.NAB_INDEXER_UNSUB })
   }
 
   /**
