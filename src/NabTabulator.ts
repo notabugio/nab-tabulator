@@ -8,7 +8,7 @@ interface Opts {
 
 const DEFAULT_OPTS: Opts = {
   socketCluster: {
-    hostname: process.env.GUN_SC_HOSTNAME || "127.0.0.1",
+    hostname: process.env.GUN_SC_HOST || "127.0.0.1",
     port: process.env.GUN_SC_PORT || 4444,
     path: process.env.GUN_SC_PATH || "/socketcluster",
     autoReconnect: true,
@@ -39,7 +39,7 @@ export class NabTabulator extends ChainGunSear {
 
     const graph = new GunGraph()
     const socket = new SocketClusterGraphConnector(options.socketCluster)
-    graph.connect(socket)
+    graph.connect(socket as any)
 
     super({ graph, ...opts })
     this.gun = this
