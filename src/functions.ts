@@ -57,12 +57,7 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
   }
 
   const endedAt = new Date().getTime()
-  console.log(
-    "tabulated",
-    (endedAt - startedAt) / 1000,
-    thingId,
-    (<any>peer.graph)._graph
-  )
+  console.log("tabulated", (endedAt - startedAt) / 1000, thingId)
 }
 
 export function idsToTabulate(msg: any) {
