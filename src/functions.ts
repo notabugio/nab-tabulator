@@ -48,6 +48,7 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
     const diff = GunNode.diff(existingCounts, updatedCounts)
     const diffKeys = Object.keys(diff)
     if (diffKeys.length) {
+      console.log("diff", diff)
       await new Promise(ok => peer.get(countsSoul).put(diff, ok))
     }
   } catch (e) {

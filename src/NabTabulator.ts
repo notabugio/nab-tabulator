@@ -1,10 +1,13 @@
 import { ChainGunSear, GunGraph, GunProcessQueue } from "@notabug/chaingun-sear"
 import SocketClusterGraphConnector from "@notabug/chaingun-socket-cluster-connector"
 import { Query, Config } from "@notabug/peer"
+import { pubFromSoul, unpackNode } from "@notabug/gun-sear"
 import { idsToTabulate, tabulateThing } from "./functions"
+import LmdbGraphConnector from "@notabug/chaingun-lmdb"
 
 interface Opts {
   socketCluster: any
+  lmdb?: any
 }
 
 const DEFAULT_OPTS: Opts = {
@@ -18,6 +21,10 @@ const DEFAULT_OPTS: Opts = {
       randomness: 100,
       maxDelay: 500
     }
+  },
+  lmdb: {
+    path: process.env.LMDB_PATH || "./data",
+    mapSize: 1024 ** 4
   }
 }
 
@@ -28,22 +35,26 @@ Config.update({
 
 export class NabTabulator extends ChainGunSear {
   socket: SocketClusterGraphConnector
+  lmdb: LmdbGraphConnector
   tabulatorQueue: GunProcessQueue
 
   gun: ChainGunSear // temp compatibility thing for notabug-peer transition
 
   constructor(options = DEFAULT_OPTS) {
-    const { socketCluster: scOpts, ...opts } = {
+    const { socketCluster: scOpts, lmdb: lmdbOpts, ...opts } = {
       ...DEFAULT_OPTS,
       ...options
     }
 
     const graph = new GunGraph()
+    const lmdb = new LmdbGraphConnector(lmdbOpts)
     const socket = new SocketClusterGraphConnector(options.socketCluster)
     graph.connect(socket as any)
 
     super({ graph, ...opts })
     this.gun = this
+    this.lmdb = lmdb
+    this.directRead = this.directRead.bind(this)
 
     this.tabulatorQueue = new GunProcessQueue()
     this.tabulatorQueue.middleware.use(id => tabulateThing(this, id))
@@ -52,18 +63,34 @@ export class NabTabulator extends ChainGunSear {
     this.authenticateAndListen()
   }
 
-  /**
-   * Temporary compatibility measure for notabug-peer until logic is moved here
-   */
   newScope(): any {
-    return Query.createScope(this, { unsub: !!process.env.NAB_INDEXER_UNSUB })
+    return Query.createScope(this, {
+      getter: this.directRead,
+      unsub: true
+    })
   }
 
-  /**
-   * Temporary compatibility measure for notabug-peer until logic is moved here
-   */
-  isLoggedIn(): any {
-    return this.user().is
+  directRead(soul: string) {
+    const start = new Date().getTime()
+    return new Promise(ok => {
+      this.lmdb.get({
+        soul,
+        cb: (msg: any) => {
+          const node = (msg && msg.put && msg.put[soul]) || undefined
+          const end = new Date().getTime()
+          const duration = end - start
+          if (duration > 100) {
+            console.log("directRead", duration, soul)
+          }
+
+          if (pubFromSoul(soul)) {
+            unpackNode(node, "mutable")
+          }
+
+          ok(node)
+        }
+      })
+    })
   }
 
   didReceiveDiff(msg: any) {
