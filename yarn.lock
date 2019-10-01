@@ -324,43 +324,36 @@
     "@nodelib/fs.scandir" "2.1.2"
     fastq "^1.6.0"
 
-"@notabug/chaingun-lmdb@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@notabug/chaingun-lmdb/-/chaingun-lmdb-0.0.5.tgz#158cb1caf11ad083c1293b79e9c119730ebf5ff5"
-  integrity sha512-EERN9+rGXqik2dcgj8UGIQdkVqqm98JD54wx6dS/wKG0G9GgjcuZGdWo4GsvybGWrVsdIfttOgz/5Ogwgm0PkA==
+"@notabug/chaingun-lmdb@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@notabug/chaingun-lmdb/-/chaingun-lmdb-0.0.6.tgz#4360234ccbfbd4eb4e0822b5a452b0de8bb704bc"
+  integrity sha512-kVronWYZ7zFetEKJsLrqlUaPUEvVKZEWGoQg1LKVCwwlICkahrY1BBE2XHytsCllA+cUhC45VZ0GBK05PHdFHw==
   dependencies:
-    "@notabug/chaingun" "^0.0.11"
+    "@notabug/chaingun" "^0.0.16"
     node-lmdb "^0.7.0"
 
-"@notabug/chaingun-sear@^0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@notabug/chaingun-sear/-/chaingun-sear-0.0.12.tgz#89707edb7c7e90eac9b145ce37e4720f77f5687b"
-  integrity sha512-GTQEqDiSMfetMn9xF7rdumbaLirHI6vlIZFNM/ZmAiFEogJBfJ1/mHiZ4CbOjUmzUweOldOS5Z9Y+48tIY0cMQ==
+"@notabug/chaingun-sear@^0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@notabug/chaingun-sear/-/chaingun-sear-0.0.14.tgz#753d027a47a8f2a045a31a6604bd6084559ff3c2"
+  integrity sha512-ciM243j11e+7sG2YGgGPBQhGkBuUPBxz/rVOxR/pTDE1MymbQnCB9MbxmoLnwTsQfw2Hzz5RRFj/tiQfZ0AiBQ==
   dependencies:
-    "@notabug/chaingun" "^0.0.14"
+    "@notabug/chaingun" "^0.0.16"
     "@notabug/gun-sear" "^0.0.18"
 
-"@notabug/chaingun-socket-cluster-connector@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@notabug/chaingun-socket-cluster-connector/-/chaingun-socket-cluster-connector-0.0.2.tgz#58338453ba568e3b90d7ec97626ae4b31a0bfef6"
-  integrity sha512-KNSaTUVz1Oaz3s1pqcN4Mve2nwhD96waMQX77DE9CHVlb5SkRjay11A63a9UJK7vL7jlx6Z6TTfLr6k3xqox/A==
+"@notabug/chaingun-socket-cluster-connector@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@notabug/chaingun-socket-cluster-connector/-/chaingun-socket-cluster-connector-0.0.3.tgz#91714cc33965cc6807998b4cd5b54875528183be"
+  integrity sha512-sVxzoH9EdKS1YZr7PUfb9c5EY8NJPvCPCkS43TNXPvVeCoSg+O8orzGiENa9JfJ9n0w4mjGgZK9t5docBjsSsQ==
   dependencies:
-    "@notabug/chaingun" "^0.0.11"
+    "@notabug/chaingun" "^0.0.16"
     "@notabug/gun-sear" "^0.0.14"
     "@types/socketcluster-client" "^13.0.3"
     socketcluster-client "^14.3.1"
 
-"@notabug/chaingun@^0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@notabug/chaingun/-/chaingun-0.0.11.tgz#8778b899bee75c41c37d6f429fe6ee3b46d816a1"
-  integrity sha512-Jv684irb3UgSxMHohkJzGzAZ5ESkKvkJt1KRwuzYPcW7iPDc9mv7kC26Yko1nPWIphf4FDgApFBLfR254QL75g==
-  dependencies:
-    reconnecting-websocket "^4.2.0"
-
-"@notabug/chaingun@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@notabug/chaingun/-/chaingun-0.0.14.tgz#eaa5e4a8549f900c3ba97b4e61748d2e91ec117e"
-  integrity sha512-urvNKu7P5rTm/tYbIJQw1w8FoFdhp/Cr63EeyrPaU495dc7Q5ZBj74bTqI0GEd0atIBI2AfWFxOka5ETUlK3+Q==
+"@notabug/chaingun@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@notabug/chaingun/-/chaingun-0.0.16.tgz#17d3d08f9478a3f567290592c6752c167397a911"
+  integrity sha512-cM5c5yG8XkQmLfxCgW2gPmQoDtnRSUPBT7xHR3OBxcDGZpGrME8UbtJcfObrmaQ9tUwNcClmRS8GXV4wXvW84Q==
   dependencies:
     reconnecting-websocket "^4.2.0"
 

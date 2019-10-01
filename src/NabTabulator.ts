@@ -48,8 +48,10 @@ export class NabTabulator extends ChainGunSear {
 
     const graph = new GunGraph()
     const lmdb = new LmdbGraphConnector(lmdbOpts)
+    lmdb.sendRequestsFromGraph(graph as any)
     const socket = new SocketClusterGraphConnector(options.socketCluster)
-    graph.connect(socket as any)
+    socket.sendPutsFromGraph(graph as any)
+    graph.connect(lmdb as any)
 
     super({ graph, ...opts })
     this.gun = this
@@ -71,21 +73,12 @@ export class NabTabulator extends ChainGunSear {
   }
 
   directRead(soul: string) {
-    const start = new Date().getTime()
     return new Promise(ok => {
       this.lmdb.get({
         soul,
         cb: (msg: any) => {
           const node = (msg && msg.put && msg.put[soul]) || undefined
-          const end = new Date().getTime()
-          const duration = end - start
-          if (duration > 100) {
-            console.log("directRead", duration, soul)
-          }
-
-          if (pubFromSoul(soul)) {
-            unpackNode(node, "mutable")
-          }
+          if (pubFromSoul(soul)) unpackNode(node, "mutable")
 
           ok(node)
         }
@@ -94,7 +87,6 @@ export class NabTabulator extends ChainGunSear {
   }
 
   didReceiveDiff(msg: any) {
-    this.socket.ingest([msg])
     const ids = idsToTabulate(msg)
     if (ids.length) {
       this.tabulatorQueue.enqueueMany(ids)
