@@ -74,7 +74,7 @@ export class NabTabulator extends ChainGunSear {
   }
 
   public authenticate(): void {
-    if (process.env.GUN_ALIAS && process.env.GUN_PASSWORD) {
+    if (process.env.GUN_ALIAS && process.env.GUN_PASSWORD && !this.user().is) {
       this.user()
         .auth(process.env.GUN_ALIAS, process.env.GUN_PASSWORD)
         .then(() => {
