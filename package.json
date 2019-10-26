@@ -1,6 +1,6 @@
 {
   "name": "@notabug/nab-tabulator",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Vote/Comment Tabulator for notabug.io",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -93,7 +93,8 @@
     }
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "semi": false
   },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",

@@ -1,6 +1,8 @@
-import { query, all } from "@notabug/gun-scope"
-import { Schema, CommentCommand, Query, GunNode } from "@notabug/peer"
-import NabTabulator from "."
+import { query, all } from '@notabug/gun-scope'
+import { Schema, CommentCommand, Query, GunNode } from '@notabug/peer'
+import NabTabulator from '.'
+
+const WRITE_TIMEOUT = 2000
 
 export const fullTabulateThing = query(async (scope, thingId) => {
   if (!thingId) return null
@@ -48,17 +50,29 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
     const diff = GunNode.diff(existingCounts, updatedCounts)
     const diffKeys = Object.keys(diff)
     if (diffKeys.length) {
-      console.log("diff", diff)
-      await new Promise(ok => peer.get(countsSoul).put(diff, ok))
+      console.log('diff', diff)
+      await new Promise((ok, fail) => {
+        const timeout = setTimeout(
+          () => fail(new Error('Write timeout')),
+          WRITE_TIMEOUT
+        )
+
+        function done(): void {
+          clearTimeout(timeout)
+          ok()
+        }
+
+        peer.get(countsSoul).put(diff, done)
+      })
     }
   } catch (e) {
-    console.error("Tabulator error", thingId, e.stack || e)
+    console.error('Tabulator error', thingId, e.stack || e)
   } finally {
     scope.off()
   }
 
   const endedAt = new Date().getTime()
-  console.log("tabulated", (endedAt - startedAt) / 1000, thingId)
+  console.log('tabulated', (endedAt - startedAt) / 1000, thingId)
 }
 
 export function idsToTabulate(msg: any) {
@@ -71,7 +85,7 @@ export function idsToTabulate(msg: any) {
     const votesDownMatch = Schema.ThingVotesDown.route.match(soul)
     const allCommentsMatch = Schema.ThingAllComments.route.match(soul)
     const thingId =
-      (votesUpMatch || votesDownMatch || allCommentsMatch || {}).thingId || ""
+      (votesUpMatch || votesDownMatch || allCommentsMatch || {}).thingId || ''
 
     if (thingId && ids.indexOf(thingId) === -1) {
       ids.push(thingId)
