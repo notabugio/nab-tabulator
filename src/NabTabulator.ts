@@ -1,7 +1,14 @@
-import LmdbGraphConnector from '@notabug/chaingun-lmdb'
-import { ChainGunSear, GunGraph, GunProcessQueue } from '@notabug/chaingun-sear'
-import SocketClusterGraphConnector from '@notabug/chaingun-socket-cluster-connector'
-import { pubFromSoul, unpackNode } from '@notabug/gun-sear'
+import createAdapter from '@chaingun/node-adapters'
+import {
+  ChainGunSeaClient,
+  GunGraph,
+  GunGraphAdapter,
+  GunGraphConnector,
+  GunGraphConnectorFromAdapter,
+  GunProcessQueue
+} from '@chaingun/sea-client'
+import { pubFromSoul, unpackNode } from '@chaingun/sear'
+import SocketClusterGraphConnector from '@chaingun/socketcluster-connector'
 import { Config, Query } from '@notabug/peer'
 import { idsToTabulate, tabulateThing } from './functions'
 
@@ -9,14 +16,9 @@ const READ_TIMEOUT = 2000
 
 interface Opts {
   readonly socketCluster: any
-  readonly lmdb?: any
 }
 
 const DEFAULT_OPTS: Opts = {
-  lmdb: {
-    mapSize: 1024 ** 4,
-    path: process.env.LMDB_PATH || './data'
-  },
   socketCluster: {
     autoReconnect: true,
     hostname: process.env.GUN_SC_HOST || '127.0.0.1',
@@ -30,27 +32,33 @@ Config.update({
   tabulator: process.env.NAB_TABULATOR || process.env.GUN_SC_PUB
 })
 
-export class NabTabulator extends ChainGunSear {
+export class NabTabulator extends ChainGunSeaClient {
   protected readonly socket: SocketClusterGraphConnector
-  protected readonly lmdb: LmdbGraphConnector
-  protected readonly tabulatorQueue: GunProcessQueue
+  protected readonly dbAdapter: GunGraphAdapter
+  protected readonly dbConnector: GunGraphConnector
+  protected readonly tabulatorQueue: GunProcessQueue<any>
 
   constructor(options = DEFAULT_OPTS) {
-    const { socketCluster: scOpts, lmdb: lmdbOpts, ...opts } = {
+    const { socketCluster: scOpts, ...opts } = {
       ...DEFAULT_OPTS,
       ...options
     }
 
     const graph = new GunGraph()
-    const lmdb = new LmdbGraphConnector(lmdbOpts)
-    lmdb.sendRequestsFromGraph(graph as any)
+    const dbAdapter = createAdapter()
+    const dbConnector = new GunGraphConnectorFromAdapter(dbAdapter)
+
+    dbConnector.sendRequestsFromGraph(graph as any)
+
     const socket = new SocketClusterGraphConnector(options.socketCluster)
     socket.sendPutsFromGraph(graph as any)
-    graph.connect(lmdb as any)
+
+    graph.connect(dbConnector as any)
 
     super({ graph, ...opts })
+    this.dbAdapter = dbAdapter
+    this.dbConnector = dbConnector
     socket.socket.on('connect', this.authenticate.bind(this))
-    this.lmdb = lmdb
     this.directRead = this.directRead.bind(this)
 
     this.tabulatorQueue = new GunProcessQueue()
@@ -96,16 +104,12 @@ export class NabTabulator extends ChainGunSear {
         ok(val)
       }
 
-      this.lmdb.get({
-        cb: (msg: any) => {
-          const node = (msg && msg.put && msg.put[soul]) || undefined
-          if (pubFromSoul(soul)) {
-            unpackNode(node, 'mutable')
-          }
+      this.dbAdapter.get(soul).then(node => {
+        if (pubFromSoul(soul)) {
+          unpackNode(node, 'mutable')
+        }
 
-          done(node)
-        },
-        soul
+        done(node)
       })
     })
   }

@@ -1,11 +1,13 @@
-import { query, all } from '@notabug/gun-scope'
-import { Schema, CommentCommand, Query, GunNode } from '@notabug/peer'
+import { all, query } from '@notabug/gun-scope'
+import { CommentCommand, GunNode, Query, Schema } from '@notabug/peer'
 import NabTabulator from '.'
 
 const WRITE_TIMEOUT = 2000
 
 export const fullTabulateThing = query(async (scope, thingId) => {
-  if (!thingId) return null
+  if (!thingId) {
+    return null
+  }
   const [up, down, comment, replySouls] = await all([
     scope.get(Schema.ThingVotesUp.route.reverse({ thingId })).count(),
     scope.get(Schema.ThingVotesDown.route.reverse({ thingId })).count(),
@@ -24,7 +26,9 @@ export const fullTabulateThing = query(async (scope, thingId) => {
   if (thingData) {
     const commandMap = CommentCommand.map(thingData)
     const commandKeys = Object.keys(commandMap)
-    if (commandKeys.length) result.commands = JSON.stringify(commandMap)
+    if (commandKeys.length) {
+      result.commands = JSON.stringify(commandMap)
+    }
   }
 
   return result
@@ -39,7 +43,9 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
     tabulator: peer.user().is.pub
   })
 
-  if (!countsSoul) return
+  if (!countsSoul) {
+    return
+  }
 
   try {
     const existingCounts = await scope.get(countsSoul).then()
@@ -76,11 +82,17 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
 }
 
 export function idsToTabulate(msg: any) {
-  const ids = []
+  const ids: ReadonlyArray<any> = []
   const put = msg && msg.put
-  if (!put) return ids
+  if (!put) {
+    return ids
+  }
 
-  for (let soul in put) {
+  for (const soul in put) {
+    if (!soul) {
+      continue
+    }
+
     const votesUpMatch = Schema.ThingVotesUp.route.match(soul)
     const votesDownMatch = Schema.ThingVotesDown.route.match(soul)
     const allCommentsMatch = Schema.ThingAllComments.route.match(soul)
@@ -88,6 +100,7 @@ export function idsToTabulate(msg: any) {
       (votesUpMatch || votesDownMatch || allCommentsMatch || {}).thingId || ''
 
     if (thingId && ids.indexOf(thingId) === -1) {
+      // @ts-ignore
       ids.push(thingId)
     }
   }
