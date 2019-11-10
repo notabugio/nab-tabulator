@@ -51,7 +51,7 @@ export class NabTabulator extends ChainGunSeaClient {
     dbConnector.sendRequestsFromGraph(graph as any)
 
     const socket = new SocketClusterGraphConnector(options.socketCluster)
-    socket.sendPutsFromGraph(graph as any)
+    dbConnector.sendPutsFromGraph(graph as any)
 
     graph.connect(dbConnector as any)
 
