@@ -131,7 +131,7 @@ export async function persistChanges(
     const diff: any = {}
     const thingChanges = changes[thingId]
     const soul = Schema.ThingVoteCounts.route.reverse({ thingId, tabulator })
-    const existing = await scope.get(soul).then()
+    const existing = (await scope.get(soul).then()) || {}
     const score = (thingChanges.ups || 0) - (thingChanges.downs || 0)
 
     if (thingChanges.ups) {
