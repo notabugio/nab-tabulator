@@ -73,8 +73,8 @@ export function describeDiff(diff: GunGraphData): TabulatorChanges | null {
 
     if (thingDataMatch) {
       const { thingId } = thingDataMatch
-      const thingData = diff[soul]
-      const { replyToId } = unpackNode(thingData)
+      const thingData = unpackNode(diff[soul])
+      const { replyToId } = thingData
 
       if (replyToId && ThingDataNode.isCommand(thingData)) {
         const commandMap = CommentCommand.map(({
