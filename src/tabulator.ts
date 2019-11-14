@@ -81,7 +81,7 @@ export function describeDiff(diff: GunGraphData): TabulatorChanges | null {
           [thingId]: thingData
         } as unknown) as any)
         const thingChanges: TabulatorThingChanges =
-          changes[thingId] || (changes[thingId] = {})
+          changes[replyToId] || (changes[replyToId] = {})
         thingChanges.commandMap = R.mergeDeepLeft(
           commandMap,
           thingChanges.commandMap || {}
