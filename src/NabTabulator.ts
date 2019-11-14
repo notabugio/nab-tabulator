@@ -10,7 +10,8 @@ import {
 import { pubFromSoul, unpackNode } from '@chaingun/sear'
 import SocketClusterGraphConnector from '@chaingun/socketcluster-connector'
 import { Config, Query } from '@notabug/peer'
-import { idsToTabulate, tabulateThing } from './functions'
+import { tabulateThing } from './functions'
+import { processDiff } from './tabulator'
 
 const READ_TIMEOUT = 2000
 
@@ -37,6 +38,7 @@ export class NabTabulator extends ChainGunSeaClient {
   protected readonly dbAdapter: GunGraphAdapter
   protected readonly dbConnector: GunGraphConnector
   protected readonly tabulatorQueue: GunProcessQueue<any>
+  protected readonly diffTabulatorQueue: GunProcessQueue<any>
 
   constructor(options = DEFAULT_OPTS) {
     const { socketCluster: scOpts, ...opts } = {
@@ -63,6 +65,9 @@ export class NabTabulator extends ChainGunSeaClient {
 
     this.tabulatorQueue = new GunProcessQueue()
     this.tabulatorQueue.middleware.use(id => tabulateThing(this, id))
+
+    this.diffTabulatorQueue = new GunProcessQueue()
+    this.diffTabulatorQueue.middleware.use(diff => processDiff(this, diff))
 
     this.socket = socket
     this.socket.subscribeToChannel(
@@ -115,10 +120,17 @@ export class NabTabulator extends ChainGunSeaClient {
   }
 
   protected didReceiveDiff(msg: any): void {
+    if (msg && msg.put) {
+      this.diffTabulatorQueue.enqueue(msg.put)
+      this.tabulatorQueue.process()
+    }
+
+    /*
     const ids = idsToTabulate(msg)
     if (ids.length) {
       this.tabulatorQueue.enqueueMany(ids)
     }
     this.tabulatorQueue.process()
+    */
   }
 }

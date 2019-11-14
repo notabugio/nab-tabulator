@@ -1,6 +1,6 @@
 {
   "name": "@notabug/nab-tabulator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vote/Comment Tabulator for notabug.io",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -56,8 +56,10 @@
     "@chaingun/sea-client": "^0.0.22",
     "@chaingun/sear": "^0.0.24",
     "@chaingun/socketcluster-connector": "^0.0.7",
+    "@chaingun/types": "^0.0.3",
     "@notabug/peer": "^0.36.3",
-    "dotenv": "^8.1.0"
+    "dotenv": "^8.1.0",
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "@bitjson/npm-scripts-info": "^1.0.0",
