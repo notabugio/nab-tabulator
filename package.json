@@ -1,6 +1,6 @@
 {
   "name": "@notabug/nab-tabulator",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Vote/Comment Tabulator for notabug.io",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",

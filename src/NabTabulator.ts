@@ -122,7 +122,7 @@ export class NabTabulator extends ChainGunSeaClient {
   protected didReceiveDiff(msg: any): void {
     if (msg && msg.put) {
       this.diffTabulatorQueue.enqueue(msg.put)
-      this.tabulatorQueue.process()
+      this.diffTabulatorQueue.process()
     }
 
     /*
