@@ -158,8 +158,8 @@ export async function persistChanges(
     }
 
     if (thingChanges.commandMap) {
-      diff.commandMap = JSON.stringify(
-        R.mergeDeepLeft(thingChanges.commandMap, existing.commandMap || {})
+      diff.commands = JSON.stringify(
+        R.mergeDeepLeft(thingChanges.commandMap, existing.commands || {})
       )
     }
 
