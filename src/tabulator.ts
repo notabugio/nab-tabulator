@@ -1,3 +1,4 @@
+import { unpackNode } from '@chaingun/sear'
 import { GunGraphData } from '@chaingun/types'
 import { CommentCommand, Schema, ThingDataNode } from '@notabug/peer'
 import * as R from 'ramda'
@@ -66,6 +67,30 @@ export function describeDiff(diff: GunGraphData): TabulatorChanges | null {
       continue
     }
 
+    const thingDataMatch =
+      Schema.ThingData.route.match(soul) ||
+      Schema.ThingDataSigned.route.match(soul)
+
+    if (thingDataMatch) {
+      const { thingId } = thingDataMatch
+      const thingData = diff[soul]
+      const { replyToId } = unpackNode(thingData)
+
+      if (replyToId && ThingDataNode.isCommand(thingData)) {
+        const commandMap = CommentCommand.map(({
+          [thingId]: thingData
+        } as unknown) as any)
+        const thingChanges: TabulatorThingChanges =
+          changes[thingId] || (changes[thingId] = {})
+        thingChanges.commandMap = R.mergeDeepLeft(
+          commandMap,
+          thingChanges.commandMap || {}
+        )
+      }
+
+      continue
+    }
+
     const thingMatch = Schema.Thing.route.match(soul)
 
     if (thingMatch) {
@@ -88,28 +113,6 @@ export function describeDiff(diff: GunGraphData): TabulatorChanges | null {
       }
 
       continue
-    }
-
-    const thingDataMatch =
-      Schema.ThingData.route.match(soul) ||
-      Schema.ThingDataSigned.route.match(soul)
-
-    if (thingDataMatch) {
-      const { thingId } = thingDataMatch
-      const thingData = diff[soul]
-      const { replyToId } = thingData
-
-      if (replyToId && ThingDataNode.isCommand(thingData)) {
-        const commandMap = CommentCommand.map(({
-          [thingId]: thingData
-        } as unknown) as any)
-        const thingChanges: TabulatorThingChanges =
-          changes[thingId] || (changes[thingId] = {})
-        thingChanges.commandMap = R.mergeDeepLeft(
-          commandMap,
-          thingChanges.commandMap || {}
-        )
-      }
     }
   }
 
