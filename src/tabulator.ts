@@ -1,6 +1,4 @@
-import { unpackNode } from '@chaingun/sear'
-import { GunGraphData } from '@chaingun/types'
-import { CommentCommand, Schema, ThingDataNode } from '@notabug/peer'
+import { CommentCommand, GunGraphData, Schema, ThingDataNode, unpackNode } from '@notabug/client'
 import * as R from 'ramda'
 import { NabTabulator } from './NabTabulator'
 

@@ -1,8 +1,20 @@
+import { CommentCommand, Query, Schema } from '@notabug/client'
 import { all, query } from '@notabug/gun-scope'
-import { CommentCommand, GunNode, Query, Schema } from '@notabug/peer'
-import NabTabulator from '.'
+import * as R from 'ramda'
+import { NabTabulator } from './NabTabulator'
 
 const WRITE_TIMEOUT = 2000
+
+const diffNode = (existing: any, updated: any) => {
+  const changedKeys = R.without(['_'], R.keysIn(updated)).filter(k => {
+    const newVal = updated[k]
+    const oldVal = R.prop(k, existing)
+
+    return !R.equals(newVal, oldVal) && `${newVal}` !== `${oldVal}`
+  })
+
+  return R.pick(changedKeys, updated)
+}
 
 export const fullTabulateThing = query(async (scope, thingId) => {
   if (!thingId) {
@@ -53,7 +65,7 @@ export async function tabulateThing(peer: NabTabulator, thingId: string) {
       existingCounts.commands = JSON.stringify(existingCounts.commands || {})
     }
     const updatedCounts = await fullTabulateThing(scope, thingId)
-    const diff = GunNode.diff(existingCounts, updatedCounts)
+    const diff = diffNode(existingCounts, updatedCounts)
     const diffKeys = Object.keys(diff)
     if (diffKeys.length) {
       console.log('diff', diff)
