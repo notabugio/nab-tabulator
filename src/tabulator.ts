@@ -97,14 +97,14 @@ export function describeDiff(diff: GunGraphData): TabulatorChanges | null {
       const replyToSoul = (thing && thing.replyTo && thing.replyTo['#']) || ''
 
       if (opSoul) {
-        const { thingId: opId } = Schema.Thing.route.match(opSoul)
+        const { thingId: opId } = Schema.Thing.route.match(opSoul) || {}
         const thingChanges: TabulatorThingChanges =
           changes[opId] || (changes[opId] = {})
         thingChanges.comments = (thingChanges.comments || 0) + 1
       }
 
       if (replyToSoul) {
-        const { thingId: replyToId } = Schema.Thing.route.match(replyToSoul)
+        const { thingId: replyToId } = Schema.Thing.route.match(replyToSoul) || {}
         const thingChanges: TabulatorThingChanges =
           changes[replyToId] || (changes[replyToId] = {})
         thingChanges.replies = (thingChanges.replies || 0) + 1
@@ -172,7 +172,11 @@ export async function persistChanges(
         ok()
       }
 
-      peer.get(soul).put(diff, done)
+      if (soul) {
+        peer.get(soul).put(diff, done)
+      } else {
+        done()
+      }
     })
   }
 }
