@@ -59,8 +59,8 @@ export class NabTabulator extends NotabugClient {
   }
 
   protected async didReceiveDiff(msg: any): Promise<void> {
-    if (msg.put && !(await this.internalAdapter.put(msg.put))) {
-      return // Avoid re-processing own writes
+    if (msg.put) {
+      await this.internalAdapter.put(msg.put)
     }
 
     if (msg && msg.put) {
