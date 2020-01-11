@@ -1,6 +1,6 @@
 {
   "name": "@notabug/nab-tabulator",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Vote/Comment Tabulator for notabug.io",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@chaingun/node-adapters": "^0.5.0",
-    "@notabug/client": "^0.0.10",
+    "@notabug/client": "^0.0.12",
     "@notabug/peer": "^0.36.3",
     "dotenv": "^8.1.0",
     "js-yaml": "^3.13.1",
